@@ -1,0 +1,17 @@
+{
+  "name": "pomodoro-timer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A calm, premium Pomodoro timer PWA. Plain HTML/CSS/JS — no build step.",
+  "license": "MIT",
+  "scripts": {
+    "serve": "npx http-server -p 8080 -c-1 -s .",
+    "test": "node tests/functional.cjs http://localhost:8080/",
+    "screenshots": "node tests/screenshots.cjs http://localhost:8080/ .screenshots",
+    "icons": "node tools/make-icons.cjs",
+    "store-shots": "node tools/make-screenshots.cjs http://localhost:8080/"
+  },
+  "devDependencies": {
+    "playwright": "^1.48.0"
+  }
+}
