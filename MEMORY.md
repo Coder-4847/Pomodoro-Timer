@@ -31,8 +31,9 @@ The bar was "award-level design and animation polish": calm, airy, faded pastels
 | Functional tests | ✅ 20/20 passing (`tests/functional.cjs`) |
 | Visual sweep | ✅ 80 screenshots, no console errors, no horizontal overflow |
 | Lighthouse (local, mobile throttling, no gzip) | Perf **95**, A11y **100**, Best Practices **100**, SEO **100** |
-| Pushed to GitHub | See §11 |
-| GitHub Pages enabled | ⚠️ **Needs a one-time manual step by the owner** (see §11) |
+| Pushed to GitHub | ✅ `main` and `claude/sharp-euler-wlq1ft` |
+| GitHub Pages deploy | ✅ Workflow run #1 succeeded ("Reported success!"), environment URL https://coder-4847.github.io/Pomodoro-Timer/ |
+| Live check from inside the session | ⚠️ Not possible: the cloud container's network policy blocks `*.github.io`. Do the 2-minute check in §11 from a real browser. |
 
 ---
 
@@ -199,13 +200,17 @@ Local run (uncompressed http-server, simulated mobile): Perf 95 / A11y 100 / BP 
 
 ---
 
-## 11. Deployment status and the owner's one-time step
+## 11. Deployment status
 
-Code is pushed (see the final session message for exact results). GitHub Pages must be switched on once by the repo owner, because the session's credentials can't change repository settings:
+- `main` was pushed first, so it is the repository's default branch. The same commits are on `claude/sharp-euler-wlq1ft`.
+- GitHub Pages was already set to **Source: GitHub Actions**. The first run of `.github/workflows/pages.yml` (run id 40069565546) succeeded and deployed commit `d109944` to **https://coder-4847.github.io/Pomodoro-Timer/**.
+- Every later push to `main` redeploys automatically. You can also run it by hand: Actions → "Deploy to GitHub Pages" → Run workflow.
+- Annotation on the run: the Pages and checkout actions target Node 20, which GitHub is deprecating. They still work. When newer major versions are out, bump `actions/checkout`, `actions/configure-pages`, `actions/upload-pages-artifact` and `actions/deploy-pages`.
 
-1. Open **https://github.com/Coder-4847/Pomodoro-Timer/settings/pages**
-2. Under **Build and deployment → Source**, choose **GitHub Actions**.
-3. Open **Actions → "Deploy to GitHub Pages" → Run workflow** on `main` (or push any commit to `main`).
-4. When the run is green, the app is at **https://coder-4847.github.io/Pomodoro-Timer/**.
-
-To verify live: open the URL; in DevTools → Application confirm the Manifest has no errors and the Service Worker is "activated and running"; reload offline and confirm it still works.
+### Live check (from any normal browser; the session sandbox couldn't reach github.io)
+1. Open https://coder-4847.github.io/Pomodoro-Timer/. The timer should appear with the entrance animation.
+2. DevTools → Application → Manifest: no errors; the icons display.
+3. Application → Service Workers: `sw.js` is "activated and running", and Cache Storage shows `pomodoro-timer-<sha>`.
+4. Network tab: no 404s. Every asset loads from `/Pomodoro-Timer/...`.
+5. Turn on Offline in DevTools and reload: the app still works.
+6. On a phone: Add to Home Screen / Install app.
