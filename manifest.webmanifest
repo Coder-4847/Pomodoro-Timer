@@ -1,0 +1,29 @@
+{
+  "id": "./",
+  "name": "Pomodoro Timer",
+  "short_name": "Pomodoro",
+  "description": "A calm, beautifully crafted Pomodoro timer with focus sessions, breaks, daily goals, streaks and stats.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f2f6fb",
+  "theme_color": "#f2f6fb",
+  "categories": ["productivity", "utilities", "lifestyle"],
+  "icons": [
+    { "src": "./assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "./assets/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "./assets/icons/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "screenshots": [
+    { "src": "./assets/screenshots/narrow.jpg", "sizes": "780x1688", "type": "image/jpeg", "form_factor": "narrow", "label": "Focus timer on a phone" },
+    { "src": "./assets/screenshots/wide.jpg", "sizes": "1280x800", "type": "image/jpeg", "form_factor": "wide", "label": "Focus timer with today's progress" }
+  ],
+  "shortcuts": [
+    { "name": "Statistics", "short_name": "Stats", "url": "./#stats", "icons": [{ "src": "./assets/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
