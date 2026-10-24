@@ -1,0 +1,357 @@
+/* ==========================================================================
+   Base: reset, document, backdrop, layout shell, utilities
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  height: 100%;
+  background: var(--bg-b);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  font-feature-settings: "cv11", "ss01";
+  color: var(--text);
+  background: var(--bg-a);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+  overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+svg {
+  display: block;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+/* Focus ring: soft, animated, never on mouse clicks */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  transition: outline-offset var(--dur-fast) var(--ease-out);
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 8px);
+  left: 50%;
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--surface-strong);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  box-shadow: var(--shadow-md);
+  transform: translate(-50%, -160%);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.skip-link:focus-visible {
+  transform: translate(-50%, 0);
+}
+
+/* ==========================================================================
+   Backdrop: drifting gradient field + grain
+   Blobs are radial gradients (no CSS blur filter) moved only with transform,
+   so the GPU composites them cheaply.
+   ========================================================================== */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(170deg, var(--bg-a) 0%, var(--bg-b) 100%);
+}
+
+.blob {
+  position: absolute;
+  width: 90vmax;
+  height: 90vmax;
+  border-radius: 50%;
+  opacity: 0.9;
+  will-change: transform;
+}
+.blob--1 {
+  top: -38vmax;
+  left: -30vmax;
+  background: radial-gradient(closest-side, var(--blob-1), transparent);
+  animation: drift-1 46s var(--ease-in-out) infinite alternate;
+}
+.blob--2 {
+  bottom: -44vmax;
+  right: -34vmax;
+  background: radial-gradient(closest-side, var(--blob-2), transparent);
+  animation: drift-2 58s var(--ease-in-out) infinite alternate;
+}
+.blob--3 {
+  top: 18vh;
+  left: 34vw;
+  width: 60vmax;
+  height: 60vmax;
+  background: radial-gradient(closest-side, var(--blob-3), transparent);
+  animation: drift-3 38s var(--ease-in-out) infinite alternate;
+}
+
+/* Static film grain: tiny tiled SVG noise, rendered once */
+.grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-theme="dark"] .grain {
+  mix-blend-mode: screen;
+  opacity: 0.035;
+  filter: invert(1);
+}
+
+/* ==========================================================================
+   App shell
+   ========================================================================== */
+.app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  height: var(--topbar-h);
+  padding: 0 var(--gutter);
+  margin-top: var(--space-2);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--fs-base);
+  letter-spacing: var(--tracking-tight);
+  border-radius: var(--radius-sm);
+}
+.brand__mark {
+  width: 26px;
+  height: 26px;
+}
+.brand__mark .mark-track {
+  stroke: var(--ring-track);
+}
+.brand__mark .mark-arc {
+  stroke: var(--ring-b);
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.views {
+  position: relative;
+  flex: 1;
+  display: grid;
+}
+.view {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+/* ---- Timer view composition ------------------------------------------- */
+.view--timer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-6);
+  padding: var(--space-3) var(--gutter) var(--space-6);
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(var(--space-4), 2.6vh, var(--space-7));
+  width: 100%;
+  max-width: 560px;
+}
+
+/* Wide screens: timer centred, a quiet side panel to the right */
+@media (min-width: 1000px) and (min-aspect-ratio: 5/4) {
+  :root {
+    --ring-size: clamp(300px, min(40vw, calc(100dvh - 330px)), 460px);
+  }
+  .view--timer {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+    align-items: center;
+    column-gap: clamp(var(--space-7), 4vw, var(--space-10));
+    padding-inline: clamp(var(--space-7), 5vw, 6rem);
+    max-width: 1440px;
+    width: 100%;
+    margin-inline: auto;
+  }
+}
+
+/* Large monitors: let the hero breathe */
+@media (min-width: 1600px) and (min-height: 1000px) and (min-aspect-ratio: 5/4) {
+  :root {
+    --ring-size: clamp(300px, min(34vw, calc(100dvh - 360px)), 540px);
+  }
+}
+
+/* Tablets in portrait get a larger hero */
+@media (min-width: 700px) and (max-aspect-ratio: 5/4) {
+  :root {
+    --ring-size: clamp(300px, min(68vw, calc(100dvh - 440px)), 500px);
+  }
+}
+
+/* Short landscape phones: keep everything on one screen */
+@media (max-height: 520px) and (orientation: landscape) {
+  :root {
+    --ring-size: clamp(180px, calc(100dvh - 120px), 320px);
+    --topbar-h: 2.75rem;
+  }
+  .view--timer {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+}
+
+@supports not (height: 1dvh) {
+  :root {
+    --ring-size: clamp(232px, min(78vw, calc(100vh - 400px)), 440px);
+  }
+}
+
+/* Footer hint (keyboard devices only) */
+.kbd-hint {
+  display: none;
+  justify-content: center;
+  padding: 0 var(--gutter) var(--space-4);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+@media (hover: hover) and (pointer: fine) {
+  .kbd-hint {
+    display: flex;
+  }
+}
+
+kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.4em;
+  margin: 0 0.15em;
+  font-family: inherit;
+  font-size: 0.85em;
+  font-weight: 550;
+  line-height: 1;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}

@@ -1,0 +1,279 @@
+/* ==========================================================================
+   Animations: keyframes, load choreography, view transitions,
+   reduced-motion overrides. Only transform/opacity (and registered colour
+   properties) are animated.
+   ========================================================================== */
+
+/* ---- Background drift: long, eased loops -------------------------------- */
+@keyframes drift-1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(12vmax, 8vmax, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(4vmax, 16vmax, 0) scale(0.96);
+  }
+}
+@keyframes drift-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(-14vmax, -6vmax, 0) scale(0.94);
+  }
+  100% {
+    transform: translate3d(-6vmax, -14vmax, 0) scale(1.04);
+  }
+}
+@keyframes drift-3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.9);
+  }
+  50% {
+    transform: translate3d(-18vmax, 6vmax, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(-8vmax, -10vmax, 0) scale(0.95);
+  }
+}
+
+/* ---- Small state animations ------------------------------------------ */
+@keyframes paused-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.045);
+    opacity: 0.65;
+  }
+}
+:root[data-status="running"] .ring__halo {
+  animation: breathe 5.2s var(--ease-in-out) infinite;
+}
+@keyframes flicker {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  22% {
+    transform: scale(1.06, 0.97) rotate(-2deg);
+  }
+  46% {
+    transform: scale(0.97, 1.05) rotate(1.5deg);
+  }
+  71% {
+    transform: scale(1.04, 0.98) rotate(-1deg);
+  }
+}
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.16);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+.toast {
+  animation: toast-in var(--dur-slow) var(--ease-spring-soft) both;
+}
+.toast.is-leaving {
+  animation: toast-out var(--dur-base) var(--ease-in) forwards;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@keyframes away-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.95);
+  }
+}
+.away-note:not([hidden]) {
+  animation: away-in var(--dur-slower) var(--ease-spring-soft) both;
+}
+
+/* ---- Page-load choreography ------------------------------------------- */
+@keyframes enter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+}
+@keyframes enter-digits {
+  from {
+    opacity: 0;
+    transform: translateY(0.28em);
+  }
+}
+@keyframes ring-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes halo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+:root.js:not(.is-loaded) .enter,
+:root.js:not(.is-loaded) .ring__track,
+:root.js:not(.is-loaded) .ring__halo {
+  opacity: 0;
+}
+:root.js:not(.is-loaded) .backdrop {
+  opacity: 0;
+}
+.backdrop {
+  transition: opacity 900ms var(--ease-out);
+}
+:root.is-loaded .enter {
+  animation: enter-rise var(--dur-slower) var(--ease-out) backwards;
+  animation-delay: calc(140ms + var(--i, 0) * 70ms);
+}
+:root.is-loaded .digits.enter {
+  animation-name: enter-digits;
+  animation-duration: 900ms;
+}
+:root.is-loaded .ring__track {
+  animation: ring-draw 1300ms var(--ease-in-out) 120ms backwards;
+}
+:root.is-loaded .ring__halo {
+  animation: halo-in 1400ms var(--ease-out) 200ms backwards;
+}
+:root.is-loaded[data-status="running"] .ring__halo {
+  animation:
+    halo-in 1400ms var(--ease-out) 200ms backwards,
+    breathe 5.2s var(--ease-in-out) 1.6s infinite;
+}
+
+/* ---- View transitions (timer ⇄ stats) ---------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-group(app-view) {
+  animation-duration: var(--dur-slower);
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-old(app-view) {
+  animation: vt-out 240ms var(--ease-in) both;
+}
+::view-transition-new(app-view) {
+  animation: vt-in 520ms var(--ease-out) 80ms both;
+}
+.views {
+  view-transition-name: app-view;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: scale(0.985) translateY(-6px);
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+}
+/* Fallback when the View Transitions API is unavailable */
+.view.is-entering {
+  animation: vt-in 520ms var(--ease-out) both;
+}
+.view.is-leaving {
+  animation: vt-out 220ms var(--ease-in) both;
+}
+
+/* Stats entrance: tiles cascade */
+.view--stats.is-shown .tile {
+  animation: rise-in var(--dur-slower) var(--ease-out) backwards;
+  animation-delay: calc(60ms + var(--i, 0) * 55ms);
+}
+
+/* ==========================================================================
+   Reduced motion: swap movement for gentle fades, keep everything usable
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 160ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  :root.is-loaded .enter,
+  .view.is-entering,
+  .view--stats.is-shown .tile,
+  .toast {
+    animation-name: fade-in !important;
+    animation-duration: 260ms !important;
+  }
+  .blob,
+  .flame.is-lit,
+  :root[data-status="running"] .ring__halo,
+  :root[data-status="paused"] .digits {
+    animation: none !important;
+  }
+  ::view-transition-old(app-view),
+  ::view-transition-new(app-view) {
+    animation: fade-in 200ms ease both !important;
+  }
+  ::view-transition-old(app-view) {
+    animation-direction: reverse !important;
+  }
+  :root[data-status="paused"] .digits {
+    opacity: 0.7;
+  }
+  :root.is-zen .zen-out {
+    transform: none !important;
+  }
+}

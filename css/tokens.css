@@ -1,0 +1,284 @@
+/* ==========================================================================
+   Design tokens
+   Type, spacing, radii, motion and the six colour worlds
+   (3 modes × light/dark). Colours are registered with @property so the
+   whole UI — gradients included — cross-fades when the mode changes.
+   ========================================================================== */
+
+/* ---- Bundled variable font (no runtime network) ------------------------- */
+@font-face {
+  font-family: "Inter Var";
+  src: url("../assets/fonts/inter-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Registered colour properties (animatable) -------------------------- */
+@property --bg-a { syntax: "<color>"; inherits: true; initial-value: #f2f6fb; }
+@property --bg-b { syntax: "<color>"; inherits: true; initial-value: #e1eaf4; }
+@property --blob-1 { syntax: "<color>"; inherits: true; initial-value: #c7d9ee; }
+@property --blob-2 { syntax: "<color>"; inherits: true; initial-value: #dce6f5; }
+@property --blob-3 { syntax: "<color>"; inherits: true; initial-value: #b9cfe8; }
+@property --surface { syntax: "<color>"; inherits: true; initial-value: rgba(255, 255, 255, 0.58); }
+@property --surface-strong { syntax: "<color>"; inherits: true; initial-value: rgba(250, 252, 255, 0.9); }
+@property --hairline { syntax: "<color>"; inherits: true; initial-value: rgba(28, 41, 56, 0.09); }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #4f769f; }
+@property --accent-text { syntax: "<color>"; inherits: true; initial-value: #3a5f87; }
+@property --accent-soft { syntax: "<color>"; inherits: true; initial-value: #d5e2f1; }
+@property --accent-ink { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --text { syntax: "<color>"; inherits: true; initial-value: #1c2938; }
+@property --text-muted { syntax: "<color>"; inherits: true; initial-value: #4e5d72; }
+@property --ring-a { syntax: "<color>"; inherits: true; initial-value: #9bbadd; }
+@property --ring-b { syntax: "<color>"; inherits: true; initial-value: #5c83ae; }
+@property --ring-track { syntax: "<color>"; inherits: true; initial-value: rgba(28, 41, 56, 0.07); }
+@property --glow { syntax: "<color>"; inherits: true; initial-value: rgba(110, 150, 200, 0.35); }
+
+:root {
+  /* ---- Typography ------------------------------------------------------- */
+  --font-sans: "Inter Var", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --fs-2xs: 0.6875rem; /* 11 */
+  --fs-xs: 0.75rem; /* 12 */
+  --fs-sm: 0.8125rem; /* 13 */
+  --fs-base: 0.9375rem; /* 15 */
+  --fs-md: 1.0625rem; /* 17 */
+  --fs-lg: 1.25rem; /* 20 */
+  --fs-xl: 1.625rem; /* 26 */
+  --fs-2xl: 2.25rem; /* 36 */
+  --fs-3xl: clamp(2.5rem, 2rem + 2vw, 3.25rem);
+  --lh-tight: 1.1;
+  --lh-snug: 1.3;
+  --lh-body: 1.5;
+  --tracking-tight: -0.02em;
+  --tracking-display: -0.045em;
+  --tracking-caps: 0.08em;
+
+  /* ---- Spacing (4px base) ----------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 2rem;
+  --space-8: 2.5rem;
+  --space-9: 3rem;
+  --space-10: 4rem;
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2rem);
+
+  /* ---- Radii ------------------------------------------------------------ */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+
+  /* ---- Depth ------------------------------------------------------------ */
+  --shadow-color: 215 30% 25%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.06), 0 2px 6px hsl(var(--shadow-color) / 0.05);
+  --shadow-md: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 4px 12px hsl(var(--shadow-color) / 0.06),
+    0 12px 32px hsl(var(--shadow-color) / 0.06);
+  --shadow-lg: 0 2px 4px hsl(var(--shadow-color) / 0.04), 0 12px 28px hsl(var(--shadow-color) / 0.08),
+    0 32px 64px hsl(var(--shadow-color) / 0.1);
+  --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+
+  /* ---- Motion ----------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  /* Spring fallbacks for browsers without linear() */
+  --ease-spring: cubic-bezier(0.34, 1.32, 0.64, 1);
+  --ease-spring-soft: cubic-bezier(0.3, 1.12, 0.6, 1);
+  --dur-instant: 90ms;
+  --dur-fast: 160ms;
+  --dur-base: 260ms;
+  --dur-slow: 420ms;
+  --dur-slower: 620ms;
+  --dur-palette: 760ms;
+  --dur-spring: 720ms;
+
+  /* ---- Layout ----------------------------------------------------------- */
+  --topbar-h: 3.5rem;
+  --tap: 44px;
+  --ring-size: clamp(232px, min(78vw, calc(100dvh - 400px)), 440px);
+  --sheet-w: 420px;
+
+  color-scheme: light;
+}
+
+/* Physically-modelled springs (generated, mass 1) where linear() exists */
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    /* stiffness 240, damping 20 — ~7% overshoot */
+    --ease-spring: linear(0, 0.039, 0.132, 0.254, 0.389, 0.524, 0.649, 0.75, 0.844, 0.919, 0.976, 1.017,
+      1.045, 1.06, 1.067, 1.067, 1.063, 1.056, 1.047, 1.038, 1.029, 1.022, 1.014, 1.009, 1.004, 1, 0.998,
+      0.997, 0.996, 0.995, 0.996, 0.996, 0.996, 0.997, 0.998, 0.998, 0.999, 0.999, 1, 1, 1);
+    /* stiffness 170, damping 20 — ~2% overshoot */
+    --ease-spring-soft: linear(0, 0.032, 0.101, 0.201, 0.303, 0.416, 0.516, 0.616, 0.697, 0.774, 0.833,
+      0.885, 0.924, 0.956, 0.979, 0.996, 1.007, 1.015, 1.019, 1.021, 1.022, 1.021, 1.019, 1.017, 1.014,
+      1.012, 1.01, 1.008, 1.006, 1.005, 1.003, 1.002, 1.001, 1.001, 1, 1, 1);
+  }
+}
+
+/* ==========================================================================
+   Colour worlds
+   ========================================================================== */
+
+/* ---- Light · Focus · powder blue --------------------------------------- */
+:root,
+:root[data-theme="light"][data-mode="focus"] {
+  --bg-a: #f2f6fb;
+  --bg-b: #e1eaf4;
+  --blob-1: rgba(178, 204, 234, 0.75);
+  --blob-2: rgba(206, 222, 243, 0.8);
+  --blob-3: rgba(160, 191, 227, 0.55);
+  --surface: rgba(255, 255, 255, 0.58);
+  --surface-strong: rgba(248, 251, 255, 0.92);
+  --hairline: rgba(28, 41, 56, 0.09);
+  --accent: #4f769f;
+  --accent-text: #3a5f87;
+  --accent-soft: #d5e2f1;
+  --accent-ink: #ffffff;
+  --text: #1c2938;
+  --text-muted: #4e5d72;
+  --ring-a: #a5c2e2;
+  --ring-b: #5c83ae;
+  --ring-track: rgba(28, 41, 56, 0.07);
+  --glow: rgba(110, 150, 200, 0.34);
+}
+
+/* ---- Light · Short break · butter -------------------------------------- */
+:root[data-theme="light"][data-mode="short"] {
+  --bg-a: #fbf7ec;
+  --bg-b: #f5ecd3;
+  --blob-1: rgba(241, 223, 165, 0.75);
+  --blob-2: rgba(248, 236, 200, 0.8);
+  --blob-3: rgba(236, 211, 145, 0.5);
+  --surface: rgba(255, 253, 246, 0.6);
+  --surface-strong: rgba(255, 252, 244, 0.93);
+  --hairline: rgba(46, 39, 24, 0.09);
+  --accent: #8f7028;
+  --accent-text: #705619;
+  --accent-soft: #f1e3bc;
+  --accent-ink: #ffffff;
+  --text: #2e2718;
+  --text-muted: #655a42;
+  --ring-a: #ead38f;
+  --ring-b: #bf9a45;
+  --ring-track: rgba(46, 39, 24, 0.07);
+  --glow: rgba(214, 178, 90, 0.34);
+  --shadow-color: 40 35% 25%;
+}
+
+/* ---- Light · Long break · apricot -------------------------------------- */
+:root[data-theme="light"][data-mode="long"] {
+  --bg-a: #fdf4ee;
+  --bg-b: #f9e3d5;
+  --blob-1: rgba(246, 199, 172, 0.7);
+  --blob-2: rgba(251, 222, 205, 0.8);
+  --blob-3: rgba(243, 186, 156, 0.5);
+  --surface: rgba(255, 251, 248, 0.6);
+  --surface-strong: rgba(255, 250, 247, 0.93);
+  --hairline: rgba(51, 35, 27, 0.09);
+  --accent: #a8603c;
+  --accent-text: #87492a;
+  --accent-soft: #f7dccb;
+  --accent-ink: #ffffff;
+  --text: #33231b;
+  --text-muted: #6e5446;
+  --ring-a: #f5c3a6;
+  --ring-b: #cf8660;
+  --ring-track: rgba(51, 35, 27, 0.07);
+  --glow: rgba(226, 150, 110, 0.32);
+  --shadow-color: 20 35% 25%;
+}
+
+/* ---- Dark · Focus ------------------------------------------------------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --shadow-color: 220 50% 3%;
+  --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+:root[data-theme="dark"][data-mode="focus"] {
+  --bg-a: #0e1521;
+  --bg-b: #131e2d;
+  --blob-1: rgba(44, 76, 118, 0.55);
+  --blob-2: rgba(32, 56, 90, 0.6);
+  --blob-3: rgba(58, 96, 140, 0.35);
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-strong: rgba(22, 32, 46, 0.94);
+  --hairline: rgba(255, 255, 255, 0.08);
+  --accent: #8db0d8;
+  --accent-text: #9dbde2;
+  --accent-soft: rgba(141, 176, 216, 0.14);
+  --accent-ink: #0e1521;
+  --text: #e4ebf3;
+  --text-muted: #98a7ba;
+  --ring-a: #b6cfea;
+  --ring-b: #6e95c2;
+  --ring-track: rgba(255, 255, 255, 0.07);
+  --glow: rgba(110, 150, 205, 0.3);
+}
+
+/* ---- Dark · Short break ------------------------------------------------- */
+:root[data-theme="dark"][data-mode="short"] {
+  --bg-a: #16130c;
+  --bg-b: #1d1910;
+  --blob-1: rgba(98, 80, 34, 0.5);
+  --blob-2: rgba(76, 62, 26, 0.55);
+  --blob-3: rgba(120, 98, 42, 0.3);
+  --surface: rgba(255, 248, 230, 0.045);
+  --surface-strong: rgba(34, 29, 19, 0.95);
+  --hairline: rgba(255, 245, 220, 0.08);
+  --accent: #e0c27a;
+  --accent-text: #e6cb8a;
+  --accent-soft: rgba(224, 194, 122, 0.13);
+  --accent-ink: #16130c;
+  --text: #f3ecdc;
+  --text-muted: #b7ac92;
+  --ring-a: #efdba6;
+  --ring-b: #c9a456;
+  --ring-track: rgba(255, 245, 220, 0.07);
+  --glow: rgba(210, 175, 90, 0.26);
+}
+
+/* ---- Dark · Long break -------------------------------------------------- */
+:root[data-theme="dark"][data-mode="long"] {
+  --bg-a: #19110d;
+  --bg-b: #211611;
+  --blob-1: rgba(122, 66, 42, 0.5);
+  --blob-2: rgba(96, 54, 36, 0.55);
+  --blob-3: rgba(140, 80, 52, 0.3);
+  --surface: rgba(255, 240, 230, 0.045);
+  --surface-strong: rgba(38, 26, 20, 0.95);
+  --hairline: rgba(255, 235, 220, 0.08);
+  --accent: #efae8a;
+  --accent-text: #f2b897;
+  --accent-soft: rgba(239, 174, 138, 0.13);
+  --accent-ink: #19110d;
+  --text: #f5e8e0;
+  --text-muted: #c0a698;
+  --ring-a: #f7cdb4;
+  --ring-b: #d98b63;
+  --ring-track: rgba(255, 235, 220, 0.07);
+  --glow: rgba(220, 140, 100, 0.26);
+}
+
+/* Palette cross-fade. Applied only after first paint (see .is-ready) so the
+   initial colours never animate in from the defaults. */
+:root.is-ready {
+  transition-property: --bg-a, --bg-b, --blob-1, --blob-2, --blob-3, --surface, --surface-strong, --hairline,
+    --accent, --accent-text, --accent-soft, --accent-ink, --text, --text-muted, --ring-a, --ring-b,
+    --ring-track, --glow;
+  transition-duration: var(--dur-palette);
+  transition-timing-function: var(--ease-in-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-palette: 300ms;
+  }
+}

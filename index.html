@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en" data-mode="focus" data-theme="light" data-status="idle">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Pomodoro Timer</title>
+    <meta
+      name="description"
+      content="A calm, beautifully crafted Pomodoro timer with focus sessions, breaks, daily goals, streaks and stats. Works offline and installs as an app."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f2f6fb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1521" media="(prefers-color-scheme: dark)" />
+
+    <!-- PWA / install -->
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Pomodoro" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <link rel="preload" href="./assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./css/tokens.css" />
+    <link rel="stylesheet" href="./css/base.css" />
+    <link rel="stylesheet" href="./css/components.css" />
+    <link rel="stylesheet" href="./css/animations.css" />
+
+    <!-- Boot: apply the saved mode + theme before first paint (no flash) -->
+    <script>
+      (function () {
+        var d = document.documentElement;
+        var t = "auto";
+        d.classList.add("js");
+        try {
+          var s = JSON.parse(localStorage.getItem("pomodoro-timer/v1") || "null");
+          var m = s && s.timer && s.timer.mode;
+          if (m === "focus" || m === "short" || m === "long") d.setAttribute("data-mode", m);
+          if (s && s.settings && s.settings.theme) t = s.settings.theme;
+        } catch (e) {}
+        var dark = t === "dark" || (t !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        d.setAttribute("data-theme", dark ? "dark" : "light");
+        // Safety net: never leave the entrance hidden if scripts fail.
+        setTimeout(function () {
+          d.classList.add("is-loaded");
+        }, 3000);
+      })();
+    </script>
+    <script type="module" src="./js/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to timer</a>
+
+    <!-- Drifting gradient field -->
+    <div class="backdrop" aria-hidden="true">
+      <div class="blob blob--1"></div>
+      <div class="blob blob--2"></div>
+      <div class="blob blob--3"></div>
+      <div class="grain"></div>
+    </div>
+
+    <!-- Icon sprite: one hand-drawn set, 24px grid, 1.75 stroke, round caps -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4.2 12a7.8 7.8 0 1 0 2.3-5.5L4.2 8.8" /><path d="M4.2 4.3v4.5h4.5" /></symbol>
+        <symbol id="i-skip" viewBox="0 0 24 24"><path d="M6.5 6.2v11.6a.6.6 0 0 0 .94.5l8.3-5.8a.6.6 0 0 0 0-1L7.44 5.7a.6.6 0 0 0-.94.5Z" /><path d="M18.5 5.5v13" /></symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7.5h8.5M17.5 7.5H20M4 16.5h2.5M11.5 16.5H20" /><circle cx="15" cy="7.5" r="2.5" /><circle cx="9" cy="16.5" r="2.5" /></symbol>
+        <symbol id="i-stats" viewBox="0 0 24 24"><path d="M5.5 19.5v-6M12 19.5v-15M18.5 19.5v-10" /></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></symbol>
+        <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3.2c.6 3.1 4.9 5.2 4.9 10a4.9 4.9 0 0 1-9.8 0c0-2.1 1-3.7 2.1-4.7.2 1.7 1 2.6 2 2.7-.6-3.2.3-5.8.8-8Z" /></symbol>
+        <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4.5 9V4.5H9M19.5 9V4.5H15M4.5 15v4.5H9M19.5 15v4.5H15" /></symbol>
+        <symbol id="i-collapse" viewBox="0 0 24 24"><path d="M9 4.5V9H4.5M15 4.5V9h4.5M9 19.5V15H4.5M15 19.5V15h4.5" /></symbol>
+        <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5.5M11 6l-6 6 6 6" /></symbol>
+        <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6" /></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14" /></symbol>
+        <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 19.5h14" /></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2a1 1 0 0 0 1 .8h7.2a1 1 0 0 0 1-.8L17.5 7" /></symbol>
+        <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5" /><path d="M7 10h.01M10.5 10h.01M14 10h.01M17 10h.01M8 14h8" /></symbol>
+        <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6.2 16.5V11a5.8 5.8 0 0 1 11.6 0v5.5l1.4 1.8H4.8Z" /><path d="M10 20.5a2.1 2.1 0 0 0 4 0" /></symbol>
+        <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3.5l1.7 5 5 1.7-5 1.7-1.7 5-1.7-5-5-1.7 5-1.7Z" /><path d="M18.5 15.5l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6Z" /></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></symbol>
+        <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="4.5" /><circle cx="12" cy="12" r=".6" /></symbol>
+        <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4.5 9.5h3l4.5-3.7v12.4l-4.5-3.7h-3Z" /><path d="M15.5 9.2a4 4 0 0 1 0 5.6M18 6.8a7.5 7.5 0 0 1 0 10.4" /></symbol>
+        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5M12 8h.01" /></symbol>
+        <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4.5 19.5h4l10-10a2.1 2.1 0 0 0-4-4l-10 10Z" /><path d="M13.5 6.5l4 4" /></symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6.5 12h11" /></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M6.5 12h11M12 6.5v11" /></symbol>
+        <symbol id="i-play-sm" viewBox="0 0 24 24"><path d="M8 6.2v11.6a.6.6 0 0 0 .92.5l8.6-5.8a.6.6 0 0 0 0-1L8.92 5.7A.6.6 0 0 0 8 6.2Z" /></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.8 12a7.8 7.8 0 1 1-2.3-5.5l2.3 2.3" /><path d="M19.8 4.3v4.5h-4.5" /></symbol>
+      </defs>
+    </svg>
+
+    <div class="app" id="app">
+      <header class="topbar enter" style="--i: 1">
+        <a class="brand" href="./" aria-label="Pomodoro Timer home">
+          <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+            <circle class="mark-track" cx="16" cy="16" r="11" fill="none" stroke-width="3.5" />
+            <circle
+              class="mark-arc"
+              cx="16"
+              cy="16"
+              r="11"
+              fill="none"
+              stroke-width="3.5"
+              stroke-linecap="round"
+              pathLength="100"
+              stroke-dasharray="72 100"
+              transform="rotate(-90 16 16)"
+            />
+          </svg>
+          <span>Pomodoro</span>
+        </a>
+        <nav class="topbar__actions" aria-label="App">
+          <button class="icon-btn" id="btn-zen" type="button" aria-label="Enter focus mode" data-tip="Focus mode · Z">
+            <svg class="icon"><use href="#i-expand" /></svg>
+          </button>
+          <button class="icon-btn" id="btn-stats" type="button" aria-label="Statistics" data-tip="Statistics">
+            <svg class="icon"><use href="#i-stats" /></svg>
+          </button>
+          <button class="icon-btn" id="btn-settings" type="button" aria-label="Settings" aria-haspopup="dialog" data-tip="Settings · ,">
+            <svg class="icon"><use href="#i-settings" /></svg>
+          </button>
+        </nav>
+      </header>
+
+      <div class="views">
+        <!-- ================= Timer view ================= -->
+        <main class="view view--timer" id="main" tabindex="-1">
+          <h1 class="sr-only">Pomodoro Timer</h1>
+          <section class="stage" aria-label="Timer">
+            <div class="segmented enter" role="radiogroup" aria-label="Timer mode" id="mode-switch" style="--i: 2">
+              <span class="segmented__pill" aria-hidden="true"></span>
+              <button class="segmented__opt" type="button" role="radio" data-mode="focus" aria-checked="true">Focus</button>
+              <button class="segmented__opt" type="button" role="radio" data-mode="short" aria-checked="false" tabindex="-1">Short Break</button>
+              <button class="segmented__opt" type="button" role="radio" data-mode="long" aria-checked="false" tabindex="-1">Long Break</button>
+            </div>
+
+            <div class="ring-wrap" id="ring-wrap">
+              <div class="ring__halo" aria-hidden="true"></div>
+              <svg class="ring" viewBox="0 0 240 240" aria-hidden="true">
+                <defs>
+                  <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
+                    <stop class="ring-stop-a" offset="0" />
+                    <stop class="ring-stop-b" offset="1" />
+                  </linearGradient>
+                  <radialGradient id="ring-tip-grad">
+                    <stop class="ring-tip-stop" offset="0" />
+                    <stop class="ring-tip-stop ring-tip-stop--end" offset="1" />
+                  </radialGradient>
+                </defs>
+                <circle class="ring__track" cx="120" cy="120" r="108" pathLength="1" />
+                <g class="ring__rot">
+                  <circle class="ring__progress" id="ring-progress" cx="120" cy="120" r="108" pathLength="1" />
+                </g>
+                <g class="ring__tip" id="ring-tip">
+                  <circle cx="120" cy="12" r="16" fill="url(#ring-tip-grad)" />
+                </g>
+              </svg>
+              <div class="ring__center" id="ring-center">
+                <span class="ring__mode enter" style="--i: 4" id="mode-label">Focus</span>
+                <span class="digits enter" id="digits" style="--i: 3" aria-hidden="true"></span>
+                <span class="dots enter" id="dots" style="--i: 5" aria-hidden="true"></span>
+                <span class="sr-only" id="time-sr" role="timer">25 minutes remaining</span>
+              </div>
+              <div class="away-note" id="away-note" hidden>
+                <svg class="icon"><use href="#i-check" /></svg>
+                <span id="away-text">Session finished while you were away</span>
+              </div>
+            </div>
+
+            <div class="task enter" style="--i: 6">
+              <label class="sr-only" for="task-input">What are you focusing on?</label>
+              <svg class="icon task__icon" aria-hidden="true"><use href="#i-pencil" /></svg>
+              <input
+                id="task-input"
+                class="task__input"
+                type="text"
+                maxlength="80"
+                autocomplete="off"
+                enterkeyhint="done"
+                spellcheck="false"
+                placeholder="What are you focusing on?"
+              />
+              <span class="task__line" aria-hidden="true"></span>
+            </div>
+
+            <div class="controls" role="group" aria-label="Timer controls">
+              <button class="ctrl enter" id="btn-reset" type="button" aria-label="Reset timer" data-tip="Reset · R" style="--i: 8">
+                <svg class="icon"><use href="#i-reset" /></svg>
+              </button>
+              <button class="play enter" id="btn-play" type="button" aria-label="Start timer" data-tip="Start · Space" style="--i: 7">
+                <span class="play__glow" aria-hidden="true"></span>
+                <svg class="play__icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path id="play-a" d="M8.5 5.6L13.5 8.65L13.5 15.35L8.5 18.4Z" />
+                  <path id="play-b" d="M13.5 8.65L19 12L19 12L13.5 15.35Z" />
+                </svg>
+              </button>
+              <button class="ctrl enter" id="btn-skip" type="button" aria-label="Skip to next phase" data-tip="Skip · S" style="--i: 8">
+                <svg class="icon"><use href="#i-skip" /></svg>
+              </button>
+            </div>
+          </section>
+
+          <!-- Today: the hero stat (side panel on wide screens) -->
+          <aside class="today enter" aria-labelledby="today-title" style="--i: 9">
+            <div class="today__head">
+              <h2 class="eyebrow" id="today-title">Today</h2>
+              <span class="today__date" id="today-date"></span>
+            </div>
+            <div class="today__hero">
+              <span class="counter" id="today-count" aria-hidden="true"></span>
+              <div class="today__hero-meta">
+                <p class="today__label"><span class="sr-only" id="today-count-sr">0</span> sessions today</p>
+                <div class="goal" id="goal">
+                  <div class="goal__bar"><span class="goal__fill" id="goal-fill"></span></div>
+                  <span class="goal__text" id="goal-text">0 of 8</span>
+                </div>
+              </div>
+            </div>
+            <dl class="today__facts">
+              <div class="fact">
+                <dt>Focus time</dt>
+                <dd id="today-time">0m</dd>
+              </div>
+              <div class="fact">
+                <dt>Streak</dt>
+                <dd><svg class="icon flame" aria-hidden="true"><use href="#i-flame" /></svg><span id="today-streak">0 days</span></dd>
+              </div>
+            </dl>
+            <div class="today__recent">
+              <h3 class="eyebrow">Recent</h3>
+              <ul class="session-list" id="today-recent"></ul>
+            </div>
+            <button class="link-btn" id="btn-open-stats" type="button">
+              View all statistics <svg class="icon"><use href="#i-chevron-right" /></svg>
+            </button>
+          </aside>
+        </main>
+
+        <!-- ================= Stats view ================= -->
+        <section class="view view--stats" id="view-stats" aria-labelledby="stats-title" hidden tabindex="-1">
+          <header class="stats-head">
+            <button class="icon-btn" id="btn-stats-back" type="button" aria-label="Back to timer">
+              <svg class="icon"><use href="#i-arrow-left" /></svg>
+            </button>
+            <h2 class="stats-head__title" id="stats-title">Statistics</h2>
+          </header>
+          <div class="stats-grid" id="stats-body"></div>
+        </section>
+      </div>
+
+      <p class="kbd-hint enter" style="--i: 10">Press <kbd>?</kbd> for keyboard shortcuts</p>
+    </div>
+
+    <!-- Zen exit control -->
+    <button class="zen-exit" id="btn-zen-exit" type="button" aria-label="Exit focus mode" tabindex="-1">
+      <svg class="icon"><use href="#i-collapse" /></svg>
+    </button>
+    <p class="zen-hint" id="zen-hint" aria-hidden="true">Tap the timer to pause · <span class="zen-hint__key">Esc</span> to exit</p>
+
+    <!-- ================= Settings sheet ================= -->
+    <div class="layer layer--sheet" id="settings-layer" hidden>
+      <div class="layer__scrim" data-close></div>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title" tabindex="-1">
+        <div class="sheet__grab">
+          <span class="sheet__handle" aria-hidden="true"></span>
+          <header class="sheet__head">
+            <h2 class="sheet__title" id="settings-title">Settings</h2>
+            <button class="icon-btn" type="button" data-close aria-label="Close settings">
+              <svg class="icon"><use href="#i-close" /></svg>
+            </button>
+          </header>
+        </div>
+        <div class="sheet__body" id="settings-body"></div>
+      </div>
+    </div>
+
+    <!-- ================= Shortcuts modal ================= -->
+    <div class="layer layer--modal" id="shortcuts-layer" hidden>
+      <div class="layer__scrim" data-close></div>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" tabindex="-1">
+        <header class="modal__head">
+          <h2 class="modal__title" id="shortcuts-title">Keyboard shortcuts</h2>
+          <button class="icon-btn" type="button" data-close aria-label="Close shortcuts">
+            <svg class="icon"><use href="#i-close" /></svg>
+          </button>
+        </header>
+        <dl class="shortcuts">
+          <div><dt><kbd>Space</kbd></dt><dd>Start / pause</dd></div>
+          <div><dt><kbd>R</kbd></dt><dd>Reset</dd></div>
+          <div><dt><kbd>S</kbd></dt><dd>Skip to next phase</dd></div>
+          <div><dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Focus · Short · Long</dd></div>
+          <div><dt><kbd>Z</kbd></dt><dd>Focus mode</dd></div>
+          <div><dt><kbd>T</kbd></dt><dd>Statistics</dd></div>
+          <div><dt><kbd>,</kbd></dt><dd>Settings</dd></div>
+          <div><dt><kbd>?</kbd></dt><dd>This cheat sheet</dd></div>
+          <div><dt><kbd>Esc</kbd></dt><dd>Close / exit</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+    <div class="sr-only" id="announcer" aria-live="polite" aria-atomic="true"></div>
+    <div class="fx-layer" id="fx-layer" aria-hidden="true"></div>
+  </body>
+</html>
